@@ -1,6 +1,7 @@
 from flask import Flask
 import paho.mqtt.client as mqtt
 import uuid
+from flask-cors import CORS, cross_origin
 
 color = "#FFFFFF"
 
@@ -10,6 +11,8 @@ topic2 = 'IDD/bar'
 topic3 = 'IDD/detect'
 port = 5000
 topic = 'IDD/#'
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe(topic)
@@ -27,6 +30,7 @@ def on_message(client, userdata, msg):
 
 
 @app.route('/')
+@cross_origin()
 def hello_world():
     global color
     return color
