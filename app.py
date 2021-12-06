@@ -1,7 +1,7 @@
 from flask import Flask
 import paho.mqtt.client as mqtt
 import uuid
-from flask-cors import CORS, cross_origin
+from flask_cors import CORS, cross_origin
 
 color = "#FFFFFF"
 
