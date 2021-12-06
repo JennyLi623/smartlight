@@ -2,6 +2,7 @@ from flask import Flask
 import paho.mqtt.client as mqtt
 import uuid
 from flask_cors import CORS, cross_origin
+import ssl
 
 color = "#FFFFFF"
 
@@ -37,7 +38,7 @@ def hello_world():
 
 if __name__ == '__main__':
     client = mqtt.Client(str(uuid.uuid1()))
-    client.tls_set()
+    client.tls_set(cert_reqs=ssl.CERT_NONE)
     client.username_pw_set('idd', 'device@theFarm')
     # attach out callbacks to the client
     client.on_connect = on_connect
