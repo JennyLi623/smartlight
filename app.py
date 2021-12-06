@@ -6,6 +6,7 @@ import ssl
 import sys
 
 color = "#FFFFFF"
+d = 0
 
 app = Flask(__name__)
 
@@ -32,24 +33,27 @@ def on_message(client, userdata, msg):
         color = "#DDDDDD"
     print(f"topic: {msg.topic} msg: {msg.payload.decode('UTF-8')}", file=sys.stderr)
 
-@app.route('/dtoc/<d>')
+@app.route('/dtoc/<dis>')
 @cross_origin()
-def d_c(d):
+def d_c(dis):
     global color
+    global d
     if (float(d) < 0.1):
         color = "#FFFFFF"
     elif (float(d) > 0.1):
         color = "#AAAAAA"
     print(color)
-    return color
+    d = dis
+    return str(dis)
 
 
 @app.route('/')
 @cross_origin()
 def hello_world():
     global color
-    print(color)
-    return color
+    global d
+    print(color, d)
+    return str(d)
 
 if __name__ == '__main__':
     client = mqtt.Client(str(uuid.uuid1()))
