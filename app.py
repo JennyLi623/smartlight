@@ -4,6 +4,7 @@ import uuid
 from flask_cors import CORS, cross_origin
 import ssl
 import sys
+from flask_sqlalchemy import SQLAlchemy
 
 color = "#FFFFFF"
 d = 0
@@ -18,6 +19,12 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['development'] = True
 app.config['debug'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hbwpqdzjkhdlax:6af94ed9702af551f17bc044ede5430e8c02af239d8a48d7c44f56ebc70f8a48@ec2-3-217-129-39.compute-1.amazonaws.com:5432/d46ssoe1tblupj'
+db = SQLAlchemy(app)
+
+class Light(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    lighting = db.Column(db.Float)
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe(topic)
@@ -38,12 +45,10 @@ def on_message(client, userdata, msg):
 def d_c(dis):
     global color
     global d
-    if (float(d) < 0.1):
-        color = "#FFFFFF"
-    elif (float(d) > 0.1):
-        color = "#AAAAAA"
-    print(color)
-    d = dis
+    print(d)
+    l = Light.query.get(1)
+    l.lighting = float(dis)
+    db.session.commit()
     return str(dis)
 
 
@@ -53,7 +58,7 @@ def hello_world():
     global color
     global d
     print(color, d)
-    return str(d)
+    return str(Light.query.get(1).lighting)
 
 if __name__ == '__main__':
     client = mqtt.Client(str(uuid.uuid1()))
