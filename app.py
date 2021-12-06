@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 import uuid
 from flask_cors import CORS, cross_origin
 import ssl
+import sys
 
 color = "#FFFFFF"
 
@@ -14,6 +15,8 @@ port = 5000
 topic = 'IDD/#'
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['development'] = True
+app.config['debug'] = True
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe(topic)
@@ -27,13 +30,25 @@ def on_message(client, userdata, msg):
         color = "#FFFFFF"
     if (msg.topic == "IDD/bar") and float(msg.payload.decode('UTF-8')) >= 0.1:
         color = "#DDDDDD"
-    print(f"topic: {msg.topic} msg: {msg.payload.decode('UTF-8')}")
+    print(f"topic: {msg.topic} msg: {msg.payload.decode('UTF-8')}", file=sys.stderr)
+
+@app.route('/dtoc/<d>')
+@cross_origin()
+def d_c(d):
+    global color
+    if (float(d) < 0.1):
+        color = "#FFFFFF"
+    elif (float(d) > 0.1):
+        color = "#AAAAAA"
+    print(color)
+    return color
 
 
 @app.route('/')
 @cross_origin()
 def hello_world():
     global color
+    print(color)
     return color
 
 if __name__ == '__main__':
@@ -48,4 +63,4 @@ if __name__ == '__main__':
     'farlab.infosci.cornell.edu',
     port=8883)
     client.loop_start()
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
